@@ -1,28 +1,60 @@
 import { IPost } from '@lib/post/doman/post.interface';
 import { randomStringGenerator } from '@nestjs/common/utils/random-string-generator.util';
-import { AggregateRoot } from '@nestjs/cqrs';
+import { PostServices } from '@lib/post/doman/services';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsString,
+  IsUUID,
+  validateSync,
+} from 'class-validator';
+import { Exclude } from 'class-transformer';
 
-export class PostAggregate extends AggregateRoot implements IPost {
+export class PostAggregate extends PostServices implements IPost {
+  @IsUUID()
   id: string = randomStringGenerator();
+
+  @IsUUID()
   authorId: string;
+
+  @IsString()
+  @IsNotEmpty()
   message: string;
+
+  @IsBoolean()
+  @Exclude()
   published = false;
+
+  @IsString()
+  @IsNotEmpty()
   title: string;
+
+  @IsString()
   createdAt = new Date().toISOString();
+
+  @IsString()
   updatedAt = new Date().toISOString();
 
-  private constructor(post: Partial<IPost>) {
+  private constructor() {
     super();
-    this.id = post.id;
-    this.authorId = post.authorId;
-    this.message = post.message;
-    this.published = post.published;
-    this.createdAt = post.createdAt;
-    this.updatedAt = post.updatedAt;
+    // this.id = post.id;
+    // this.authorId = post.authorId;
+    // this.message = post.message;
+    // this.published = post.published;
+    // this.createdAt = post.createdAt;
+    // this.updatedAt = post.updatedAt;
   }
 
   static create(post: Partial<IPost>) {
-    const _post = new PostAggregate(post);
+    const _post = new PostAggregate();
+    Object.assign(_post, post);
+    _post.updatedAt = post?.id ? new Date().toISOString() : _post.updatedAt;
+
+    const errors = validateSync(post, { whitelist: true });
+    if (errors.length) {
+      throw new Error('Post not valid');
+    }
+
     return _post;
   }
 }
