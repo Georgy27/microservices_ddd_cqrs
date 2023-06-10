@@ -29,6 +29,24 @@
       ],
       "@lib/entities/*": [
         "libs/entities/src/*"
+      ],
+      "@lib/post": [
+        "libs/post/src"
+      ],
+      "@lib/post/*": [
+        "libs/post/src/*"
+      ],
+      "@lib/errors": [
+        "libs/errors/src"
+      ],
+      "@lib/errors/*": [
+        "libs/errors/src/*"
+      ],
+      "@lib/shared": [
+        "libs/shared/src"
+      ],
+      "@lib/shared/*": [
+        "libs/shared/src/*"
       ]
     }
   }
