@@ -16,6 +16,7 @@ export class PostAggregate extends PostServices implements IPost {
   id: string = randomStringGenerator();
 
   @IsUUID()
+  @IsNotEmpty()
   authorId: string;
 
   @IsString()
