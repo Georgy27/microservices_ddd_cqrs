@@ -4,6 +4,6 @@ export interface ISetPublished {
   setPublished(): void;
 }
 
-export const SET_PUBLISHED = async function (this: IPost) {
+export const SET_PUBLISHED = function (this: IPost) {
   this.published = true;
 };
