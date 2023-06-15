@@ -6,19 +6,19 @@ import { Logger } from '@nestjs/common';
 
 @QueryHandler(GetPostsQuery)
 export class GetPostsQueryHandler
-  implements IQueryHandler<GetPostsQuery, [[PostAggregate], number]>
+  implements IQueryHandler<GetPostsQuery, [PostAggregate[], number]>
 {
   private readonly logger = new Logger(GetPostsQuery.name);
   constructor(private readonly postRepository: PostRepository) {}
   async execute({
     pagination,
-  }: GetPostsQuery): Promise<[[PostAggregate], number]> {
+  }: GetPostsQuery): Promise<[PostAggregate[], number]> {
     const [data, count] = await this.postRepository
       .findAll(pagination)
       .catch((err) => {
         this.logger.error(err);
         return [[], 0];
       });
-    return [data, count] as [[PostAggregate], number];
+    return [data, count] as [PostAggregate[], number];
   }
 }

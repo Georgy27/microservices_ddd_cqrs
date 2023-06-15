@@ -3,9 +3,9 @@ import { PaginationDto } from '@lib/shared/dto';
 
 export abstract class PostRepository {
   abstract save(post: IPost): Promise<PostAggregate>;
-  abstract findOne(id: string): Promise<PostAggregate | null>;
+  abstract findOne(id: string): Promise<PostAggregate>;
   abstract findAll(
     pagination: PaginationDto,
-  ): Promise<[[PostAggregate], number]>;
+  ): Promise<[PostAggregate[], number]>;
   abstract delete(id: string): Promise<boolean>;
 }
