@@ -23,4 +23,4 @@ const options = (): DataSourceOptions => {
     migrationsTableName: 'migrations',
   };
 };
-export const appDataSoruce = new DataSource(options());
+export const appDataSource = new DataSource(options());
