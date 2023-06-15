@@ -14,12 +14,34 @@ export class PostAdapter implements PostRepository {
     private readonly postRepository: Repository<PostEntity>,
   ) {}
 
-  async delete(id: string): Promise<boolean> {
-    const result = await this.postRepository.delete({ id }).catch((err) => {
-      this.logger.error(err);
-      return false;
-    });
-    return !!result;
+  async save(post: IPost): Promise<PostAggregate> {
+    if (post?.id) {
+      const existPost = await this.findOne(post.id);
+
+      if (!existPost) {
+        throw new NotFoundException(`Post by id${post.id} not found`);
+      }
+
+      const { id, ...toUpdate } = post;
+      await this.postRepository.update({ id }, toUpdate);
+
+      return this.findOne(post.id);
+    }
+    const savedPost = await this.postRepository.save(post);
+    return PostAggregate.create(savedPost);
+  }
+
+  async findOne(id: string): Promise<PostAggregate> {
+    const existPost = await this.postRepository
+      .findOneBy({ id })
+      .catch((err) => {
+        this.logger.error(err);
+        return null;
+      });
+    if (!existPost) {
+      throw new NotFoundException(`Post by id ${id} not found`);
+    }
+    return PostAggregate.create(existPost);
   }
 
   async findAll(pagination: PaginationDto): Promise<[PostAggregate[], number]> {
@@ -47,34 +69,11 @@ export class PostAdapter implements PostRepository {
 
     return [data.map((post) => PostAggregate.create(post)), count];
   }
-
-  async findOne(id: string): Promise<PostAggregate> {
-    const existPost = await this.postRepository
-      .findOneBy({ id })
-      .catch((err) => {
-        this.logger.error(err);
-        return null;
-      });
-    if (!existPost) {
-      throw new NotFoundException(`Post by id ${id} not found`);
-    }
-    return PostAggregate.create(existPost);
-  }
-
-  async save(post: IPost): Promise<PostAggregate> {
-    if (post?.id) {
-      const existPost = await this.findOne(post.id);
-
-      if (!existPost) {
-        throw new NotFoundException(`Post by id${post.id} not found`);
-      }
-
-      const { id, ...toUpdate } = post;
-      await this.postRepository.update({ id }, toUpdate);
-
-      return this.findOne(post.id);
-    }
-    const savedPost = await this.postRepository.save(post);
-    return PostAggregate.create(savedPost);
+  async delete(id: string): Promise<boolean> {
+    const result = await this.postRepository.delete({ id }).catch((err) => {
+      this.logger.error(err);
+      return false;
+    });
+    return !!result;
   }
 }
